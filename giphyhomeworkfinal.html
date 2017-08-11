@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Giphy Homework</title>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+  <style type="text/css">
+    body{
+      width: 100vw;
+      height: 100vh;
+      background-size: cover;
+ 
+    }     
+    .searchDiv {
+      margin-bottom: 40px;
+    }
+    .images {
+      margin-bottom: 30px;
+      border: 5px solid black;
+    }
+    p{
+      font-size: 15px;
+      background: black;
+      padding-bottom: 20px;
+      margin-bottom: -15px;
+      color:white;
+    }
+    button {
+      margin-left: 40px;
+      margin-bottom: 20px;
+      margin-top: 20px;
+      color: red;
+      background-color:blue;
+      border-radius: 15px;
+      outline: 0;
+      box-shadow: 5px 5px 2px black;
+    }
+    .view1 {
+  position : center;
+  background-size: cover;
+  width: 100vh;
+  height: 100vw;
+
+}
+  form {
+    margin-left: 40px;
+  }
+
+  </style>
+</head>
+<div class="view1"><div class="view2 viewIn">
+<body>
+
+<div class="container">
+
+  
+
+	<div id="buttons"></div>
+	<form id="gifInput">
+    <label for="resturant-input">Add a Resturant</label>
+    <input type="text" id="gif-search"></input><br>
+
+    <button type="submit" id="submit-form">Submit</button>
+  </form>
+  <div class="row giphs">
+  
+  
+  </div>
+  
+
+  </body>
+  </div></div>
+  <script src="http://code.jquery.com/jquery-2.1.3.min.js"></script>
+  <script src="https://cdn.rawgit.com/terotests/css/a59922b30dcb8b72441d481266373938f3fee749/css.js"></script>
+      <script type="text/javascript">
+      $(document).ready()
+      $(function(){
+        renderButtons();
+
+      }) ;
+      var state1 = {
+  width : "100%", height:"138%",
+  "background" : "linear-gradient(40deg, #fA076C, #2E54E9)"
+};
+
+var state2 = {
+  width : "100%", height:"138%",
+  "background" : "linear-gradient(-40deg, #fA076C, #8E54E9)"
+};
+css().bind(".view1", state1);
+css().bind(".view2", state2);
+css().animation("viewIn", {
+    duration : "4s",
+    "iteration-count" : 4,
+}, {opacity:1},  0.5, {opacity:1}, 1, {opacity:1});
+      //my array full of topics
+      var topics = ["Family Guy", "How I Met Your Mother", "Kenny Powers", "Silicon Valley"]
+      //rendering buttons based on topics
+      function renderButtons() {
+        $('#buttons').empty();
+      for (var i = 0; i < topics.length; i++) {
+          var a = $('<button>');
+      		a.addClass('shownButton');
+      		a.attr('data-type', topics[i]);
+      		a.text(topics[i]);
+      		$('#buttons').append(a);
+
+      }};
+
+      $(document).on('click', '.shownButton', function() {
+          $('.giphs').empty();
+          var type = $(this).data('type');
+          var queryURL = "http://api.giphy.com/v1/gifs/search?q=" +type+ "&api_key=54945142cc0e4d0995a025127d7371ad&limit=12";
+          console.log(type);
+          $.ajax({
+            url: queryURL,
+            method: 'GET'
+            }).done(function(response) {
+              console.log(response);
+
+
+              for(var i = 0; i < response.data.length; i++)  {
+
+                  var searchDiv = $('<div class="searchDiv col-md-4">')
+                  var Rating = response.data[i].rating;
+                  var p = $('<p>');
+                  p.append("Rating: " + Rating);
+                  var animated = response.data[i].images.fixed_height.url;
+                  var still = response.data[i].images.fixed_height_still.url;
+                  var image = $('<img>');
+                  image.attr('src', still);
+                  image.attr('data-still', still);
+                  image.attr('data-animated', animated);
+                  image.attr('data-state', still);
+                  image.attr('width', 300);
+                  image.attr('height', 200);
+                  image.addClass('images');
+                  searchDiv.append(p);
+                  searchDiv.append(image);
+                  $('.giphs').append(searchDiv);
+
+                }});
+              });
+
+            
+
+        $(document).on('click','.images', function(){
+          var state = $(this).attr('data-state');
+          if(state =="still") {
+            $(this).attr('src', $(this).data('animated'));
+            $(this).attr('data-state', 'animated');
+          } else {
+            $(this).attr('src', $(this).data('still'));
+            $(this).attr('data-state', 'still');
+
+          }
+        });
+
+		
+       
+       $('#submit-form').on('click', function(event){
+            event.preventDefault();
+            $('.giphs').empty();
+            var userInput = $('#gif-search').eq(0).val().trim();
+            $('#gifInput').find('input').val('');
+            console.log(userInput);
+            topics.push(userInput);
+            renderButtons();
+       });
+      </script>
+</html>
